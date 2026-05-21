@@ -7,9 +7,11 @@ import express, {
 
 
 //import logger from "./middleware/logger";
-//import cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import globalErrorHandler from "./middleware/globalErrorhandelar";
+import { AuthRoutes } from "./modules/auth/auth.route";
+import notFound from "./middleware/notFound";
 
 
 
@@ -17,7 +19,7 @@ import globalErrorHandler from "./middleware/globalErrorhandelar";
 const app: Application = express();
 
 
-//app.use(cookieParser());
+app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,7 +38,11 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
+app.use("/api/auth",AuthRoutes);
 
+
+// Not Found Middleware
+app.use(notFound);
 // Global Error Handler
 app.use(globalErrorHandler);
 
