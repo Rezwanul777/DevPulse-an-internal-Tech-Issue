@@ -15,6 +15,29 @@ const createIssue = catchAsync(async (req: Request, res: Response) => {
   })
 });
 
+const getAllIssues = catchAsync(async (req: Request, res: Response) => {
+  const result = await IssueService.getAllIssuesFromDB(req.query);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    data: result,
+  });
+});
+
+const getSingleIssue = catchAsync(async (req: Request, res: Response) => {
+  const result = await IssueService.getSingleIssueFromDB(Number(req.params.id));
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    data: result,
+  });
+});
+
+
 export const IssueController={
-    createIssue
+    createIssue,
+    getAllIssues,
+    getSingleIssue
 }

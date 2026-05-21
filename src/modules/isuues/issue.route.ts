@@ -6,6 +6,7 @@ import { IssueController } from "./issue.controller";
 const router = express.Router();
 
 router.post("/", auth("contributor", "maintainer"), IssueController.createIssue);
-
+router.get("/", IssueController.getAllIssues);
+router.get("/:id", IssueController.getSingleIssue);
 
 export const IssueRoutes = router;
