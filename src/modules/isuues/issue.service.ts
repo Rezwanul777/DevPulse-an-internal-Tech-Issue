@@ -139,8 +139,90 @@ const getSingleIssueFromDB = async (id: number) => {
 };
 
 
+const updateIssueIntoDB = async (id: number, payload: any, user: any) => {
+  const issueResult = await pool.query(
+    `
+      SELECT *
+      FROM issues
+      WHERE id = $1
+    `,
+    [id]
+  );
+
+  const issue = issueResult.rows[0];
+
+  if (!issue) {
+    throw new Error("Issue not found");
+  }
+
+  // Contributor role
+  if (user.role === "contributor") {
+    if (issue.reporter_id !== user.id) {
+      throw new Error("You can update only your own issue");
+    }
+
+    if (issue.status !== "open") {
+      throw new Error("You can update only open issue");
+    }
+
+  
+    if (payload.status) {
+      throw new Error("Contributor cannot update issue status");
+    }
+  }
+
+  // Maintainer can update status
+  if (payload.status) {
+    if (
+      payload.status !== "open" &&
+      payload.status !== "in_progress" &&
+      payload.status !== "resolved"
+    ) {
+      throw new Error("Status must be open, in_progress, or resolved");
+    }
+  }
+
+  const title = payload.title !== undefined ? payload.title : issue.title;
+  const description =
+    payload.description !== undefined ? payload.description : issue.description;
+  const type = payload.type !== undefined ? payload.type : issue.type;
+  const status = payload.status !== undefined ? payload.status : issue.status;
+
+  if (title.length > 150) {
+    throw new Error("Title cannot be more than 150 characters");
+  }
+
+  if (description.length < 20) {
+    throw new Error("Description must be at least 20 characters");
+  }
+
+  if (type !== "bug" && type !== "feature_request") {
+    throw new Error("Type must be bug or feature_request");
+  }
+
+  const updatedResult = await pool.query(
+    `
+      UPDATE issues
+      SET title = $1,
+          description = $2,
+          type = $3,
+          status = $4,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $5
+      RETURNING *
+    `,
+    [title, description, type, status, id]
+  );
+
+  return updatedResult.rows[0];
+};
+
+
+
 export const IssueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
-  getSingleIssueFromDB
+  getSingleIssueFromDB,
+  updateIssueIntoDB
 }
+  
