@@ -9,6 +9,7 @@ import express, {
 //import logger from "./middleware/logger";
 //import cookieParser from "cookie-parser";
 import cors from "cors";
+import globalErrorHandler from "./middleware/globalErrorhandelar";
 
 
 
@@ -37,9 +38,6 @@ app.get("/", (req: Request, res: Response) => {
 
 
 // Global Error Handler
-app.use((err: Error, req: Request, res: Response) => {
-  console.error(err.stack);
-  res.status(500).json({ message: err.message || "Internal Server Error" });
-});
+app.use(globalErrorHandler);
 
 export default app;
