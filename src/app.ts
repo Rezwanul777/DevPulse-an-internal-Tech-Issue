@@ -12,6 +12,7 @@ import cors from "cors";
 import globalErrorHandler from "./middleware/globalErrorhandelar";
 import { AuthRoutes } from "./modules/auth/auth.route";
 import notFound from "./middleware/notFound";
+import { IssueRoutes } from "./modules/isuues/issue.route";
 
 
 
@@ -37,8 +38,13 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
+// Routes
+
 
 app.use("/api/auth",AuthRoutes);
+
+app.use("/api/issues", IssueRoutes);
+
 
 
 // Not Found Middleware
