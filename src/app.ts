@@ -40,9 +40,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // Routes
 
-
 app.use("/api/auth",AuthRoutes);
-
 app.use("/api/issues", IssueRoutes);
 
 

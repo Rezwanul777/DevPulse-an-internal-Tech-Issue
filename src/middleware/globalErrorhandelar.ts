@@ -1,13 +1,12 @@
-import type { NextFunction, Request, Response } from "express";
-import config from "../config";
+import { type ErrorRequestHandler } from "express";
 
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
 
-
-const globalErrorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json({
+  res.status(statusCode).json({
     success: false,
-    message: err instanceof Error ? err.message : "Internal Server Error",
-    stack: config.node_env === "development" && err instanceof Error ? err.stack : undefined,
+    message: err.message || "Something went wrong",
+    errors: err.message || "Internal Server Error",
   });
 };
 

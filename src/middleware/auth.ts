@@ -16,12 +16,10 @@ const auth = (...requiredRoles: string[]) => {
     try {
       let token = req.headers.authorization;
 
-      // If token is in header, extract it
       if (token && token.startsWith("Bearer ")) {
         token = token.split(" ")[1];
       }
 
-      // If token is not in header, check cookies
       if (!token && req.cookies?.accessToken) {
         token = req.cookies.accessToken;
       }
@@ -30,6 +28,7 @@ const auth = (...requiredRoles: string[]) => {
         return res.status(401).json({
           success: false,
           message: "You are not authorized",
+          errors: "Access token is missing",
         });
       }
 
@@ -37,11 +36,11 @@ const auth = (...requiredRoles: string[]) => {
 
       req.user = decoded;
 
-      // Role check
       if (requiredRoles.length > 0 && !requiredRoles.includes(req.user.role)) {
         return res.status(403).json({
           success: false,
           message: "Forbidden access",
+          errors: "You do not have permission to access this route",
         });
       }
 
@@ -50,6 +49,7 @@ const auth = (...requiredRoles: string[]) => {
       return res.status(401).json({
         success: false,
         message: "Invalid or expired token",
+        errors: "JWT verification failed",
       });
     }
   };
