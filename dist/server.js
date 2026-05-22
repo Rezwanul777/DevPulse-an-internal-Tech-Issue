@@ -198,13 +198,13 @@ var login2 = catchAsync_default(async (req, res) => {
   const result = await AuthService.login(req.body);
   res.cookie("accessToken", result.accessToken, {
     httpOnly: true,
-    secure: config_default.node_env === "development",
+    secure: config_default.node_env === "production",
     sameSite: "strict",
     maxAge: 15 * 24 * 60 * 60 * 1e3
   });
   res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
-    secure: config_default.node_env === "development",
+    secure: config_default.node_env === "production",
     sameSite: "strict",
     maxAge: 30 * 24 * 60 * 60 * 1e3
   });
@@ -558,11 +558,18 @@ app.use(globalErrorhandelar_default);
 var app_default = app;
 
 // src/server.ts
-var main = () => {
-  initDB();
-  app_default.listen(config_default.port, () => {
-    console.log(`Server running on port ${config_default.port}`);
-  });
+var dbInitialized = false;
+async function bootstrap() {
+  if (!dbInitialized) {
+    await initDB();
+    dbInitialized = true;
+  }
+}
+async function handler(req, res) {
+  await bootstrap();
+  return app_default(req, res);
+}
+export {
+  handler as default
 };
-main();
 //# sourceMappingURL=server.js.map
